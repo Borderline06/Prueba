@@ -1,0 +1,306 @@
+
+package vista.modulos;
+
+import datos.AlmacenDatos;
+import datos.comun.Coleccion;
+import datos.tad.cola.Cola;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+import modelo.Cliente;
+import utilitarios.Constantes;
+import vista.comun.Vista;
+
+public class VistaAtencionClientes extends Vista {
+
+    /**
+     * Creates new form VistaAtencionClientes
+     */
+    Cola<Cliente> colaClientes;
+    private DefaultListModel<String> modeloListaClientes;
+    private DefaultListModel<String> modeloListaCola;
+    
+    
+    public VistaAtencionClientes(Constantes.Ordenamiento ordenamiento, Constantes.Busqueda busqueda) {
+        super("Atención de Clientes");
+        initComponents();
+        colaClientes = new Cola<>();
+        modeloListaClientes = new DefaultListModel<>();
+        modeloListaCola = new DefaultListModel<>();
+        lstClientes.setModel(modeloListaClientes);
+        lstColaActual.setModel(modeloListaCola);
+        cargarClientesRegistrados();
+        this.TAD = " - TAD Cola";
+        
+        ImageIcon iconoOriginal = new ImageIcon(getClass().getResource("/recursos/iconos/queue.png"));
+        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+        btnAgregarCliente.setIcon(new ImageIcon(imagenEscalada));
+        iconoOriginal = new ImageIcon(getClass().getResource("/recursos/iconos/recruitment.png"));
+        imagenEscalada = iconoOriginal.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+        btnAtenderCliente.setIcon(new ImageIcon(imagenEscalada));
+    }
+    private void cargarClientesRegistrados() {
+        AlmacenDatos.clientes.iniciarIteracion();
+        while (AlmacenDatos.clientes.actualElementoIteracion() != null) {
+            Cliente cliente = AlmacenDatos.clientes.actualElementoIteracion();
+            modeloListaClientes.addElement(cliente.getNombre());
+            AlmacenDatos.clientes.avanzarIteracion();
+        }
+    }
+    private void agregarCliente() {
+        int selectedIndex = lstClientes.getSelectedIndex();
+        if (selectedIndex != -1) {
+            String nombreCliente = modeloListaClientes.getElementAt(selectedIndex);
+            Cliente cliente = buscarClientePorNombre(nombreCliente);
+            if (cliente != null) {
+                colaClientes.agregar(cliente);
+                modeloListaCola.addElement(cliente.getNombre());
+                modeloListaClientes.remove(selectedIndex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione un cliente de la lista.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private Cliente buscarClientePorNombre(String nombre) {
+        AlmacenDatos.clientes.iniciarIteracion();
+        while (AlmacenDatos.clientes.actualElementoIteracion() != null) {
+            Cliente cliente = AlmacenDatos.clientes.actualElementoIteracion();
+            if (cliente.getNombre().equals(nombre)) {
+                return cliente;
+            }
+            AlmacenDatos.clientes.avanzarIteracion();
+        }
+        return null;
+    }
+
+    private void atenderCliente() {
+        if (!colaClientes.estaVacio()) {
+            Cliente clienteAtendido = colaClientes.desencolar();
+            txtClienteActual.setText("Cliente actual: " + clienteAtendido.getNombre());
+            modeloListaCola.removeElement(clienteAtendido.getNombre());
+
+            // Animación de cambio de color
+            Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
+            final int[] index = {0}; 
+            Timer colorChangeTimer = new Timer(100, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtClienteActual.setBackground(colors[index[0]]);
+                    index[0] = (index[0] + 1) % colors.length;
+                }
+            });
+            colorChangeTimer.start();
+
+            Timer stopTimer = new Timer(2000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    colorChangeTimer.stop();
+                    txtClienteActual.setBackground(Color.WHITE); // Restablece el color original
+                    // Agregar cliente nuevamente a la lista de clientes
+                    modeloListaClientes.addElement(clienteAtendido.getNombre());
+                }
+            });
+            stopTimer.setRepeats(false);
+            stopTimer.start();
+
+        } else {
+            txtClienteActual.setText("Cliente actual: Ninguno");
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel2 = new javax.swing.JPanel();
+        btnAgregarCliente = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lstClientes = new javax.swing.JList<>();
+        jPanel3 = new javax.swing.JPanel();
+        txtClienteActual = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        lstColaActual = new javax.swing.JList<>();
+        btnAtenderCliente = new javax.swing.JButton();
+
+        setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.PAGE_AXIS));
+
+        btnAgregarCliente.setText("Agregar Cliente");
+        btnAgregarCliente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnAgregarCliente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnAgregarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarClienteActionPerformed(evt);
+            }
+        });
+
+        lstClientes.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(lstClientes);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnAgregarCliente)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                    .addComponent(btnAgregarCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        add(jPanel2);
+
+        jPanel3.setPreferredSize(new java.awt.Dimension(800, 253));
+
+        txtClienteActual.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+
+        jLabel2.setText("Cola Actual:");
+
+        lstColaActual.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(lstColaActual);
+
+        btnAtenderCliente.setText("Atender Cliente");
+        btnAtenderCliente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnAtenderCliente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnAtenderCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtenderClienteActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnAtenderCliente)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel2)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addComponent(txtClienteActual)))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addComponent(txtClienteActual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnAtenderCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2))
+                .addContainerGap(10, Short.MAX_VALUE))
+        );
+
+        add(jPanel3);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnAgregarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarClienteActionPerformed
+        agregarCliente();
+    }//GEN-LAST:event_btnAgregarClienteActionPerformed
+
+    private void btnAtenderClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtenderClienteActionPerformed
+        atenderCliente();
+    }//GEN-LAST:event_btnAtenderClienteActionPerformed
+
+    @Override
+    public void cambiarBusqueda(Constantes.Busqueda busqueda) {
+        
+    }
+
+    @Override
+    public void cambiarOrdenamiento(Constantes.Ordenamiento ordenamiento) {
+        
+    }
+
+    @Override
+    public void Limpiar() {
+        
+    }
+
+    @Override
+    public void Listar() {
+        
+    }
+
+    @Override
+    public boolean Guardar() {
+        return false;
+    }
+
+    @Override
+    public void Activar(Constantes.Activar tipo) {
+        
+    }
+
+    @Override
+    public boolean Eliminar() {
+        return false;
+    }
+
+    @Override
+    public <T> T Buscar() {
+        return null;
+    }
+
+    @Override
+    public boolean validarCampos() {
+        return false;
+    }
+
+    @Override
+    public void Ordenar(boolean asc) {
+        
+    }
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregarCliente;
+    private javax.swing.JButton btnAtenderCliente;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JList<String> lstClientes;
+    private javax.swing.JList<String> lstColaActual;
+    private javax.swing.JTextField txtClienteActual;
+    // End of variables declaration//GEN-END:variables
+}

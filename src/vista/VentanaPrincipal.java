@@ -1,0 +1,844 @@
+package vista;
+
+import datos.tad.pila.PilaVista;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.beans.PropertyChangeEvent;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import vista.comun.Vista;
+import vista.modulos.VistaLibro;
+import vista.modulos.VistaCliente;
+import vista.modulos.VistaProveedor;
+import vista.modulos.pedido.VistaPedido;
+import javax.swing.JDialog;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import utilitarios.Constantes;
+import vista.modulos.VistaAtencionClientes;
+import vista.modulos.VistaGrafos;
+import vista.modulos.VistaRecomendacion;
+
+public class VentanaPrincipal extends javax.swing.JFrame {
+
+    /**
+     * Creates new form vistaPrincipal
+     */
+    PilaVista<Vista> historialNavegacion = new PilaVista<>();
+    private Image backgroundImage;
+    public static Image logoUTP;
+
+    public VentanaPrincipal() {
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("/resources/bookBG.jpg"));
+            logoUTP = ImageIO.read(getClass().getResource("/resources/logo_UTP.png"));
+        } catch (IOException e) {
+        }
+        initComponents();
+        Limpiar();
+        //Valores por defecto
+        IniciarBusquedaOrdenamiento();
+
+    }
+
+    
+    
+    private ImageIcon cargarIcono(String ruta) {
+        ImageIcon iconoOriginal = new ImageIcon(getClass().getResource(ruta));
+        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenEscalada);
+    }
+
+    private ImageIcon cargarIconoMenu(String ruta) {
+        ImageIcon iconoOriginal = new ImageIcon(getClass().getResource(ruta));
+        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenEscalada);
+    }
+
+    private JLabel crearLabelConIcono(String texto, String rutaIcono) {
+        JLabel label = new JLabel(texto);
+        label.setIcon(new ImageIcon(getClass().getResource(rutaIcono)));
+        label.setVerticalTextPosition(JLabel.BOTTOM);
+        label.setHorizontalTextPosition(JLabel.CENTER);
+        return label;
+    }
+
+    private void IniciarBusquedaOrdenamiento() {
+        ordenamiento = Constantes.Ordenamiento.BUBBLE;
+        busqueda = Constantes.Busqueda.SEQUENCIAL;
+        rbBubble.setEnabled(true);
+        rbSecuencial.setEnabled(true);
+    }
+
+    private JInternalFrame crearInternalFrame(String titulo, Vista vista) {
+        JInternalFrame internalFrame = new JInternalFrame(titulo, true, true, true, true);
+        internalFrame.setContentPane(vista);
+        internalFrame.pack();
+        // Establecer la referencia al JInternalFrame en la vista
+        vista.setInternalFrame(internalFrame);
+        internalFrame.addPropertyChangeListener("selected", (PropertyChangeEvent evt) -> {
+            if (Boolean.TRUE.equals(evt.getNewValue())) {
+                internalFrameStateChanged(evt);
+            }
+        });
+        internalFrame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                internalFrameCerrado(evt);
+            }
+        });
+        mdiContenedor.add(internalFrame);
+        internalFrame.setVisible(true);
+        return internalFrame;
+    }
+
+    private void internalFrameCerrado(javax.swing.event.InternalFrameEvent evt) {
+        JInternalFrame closedFrame = (JInternalFrame) evt.getInternalFrame();
+        if (closedFrame.getContentPane().getComponentCount() > 0
+                && closedFrame.getContentPane() instanceof Vista) {
+
+            Vista vista = (Vista) closedFrame.getContentPane();
+            historialNavegacion.eliminar(vista); // Elimina la vista de la pila de navegación
+        }
+    }
+
+    private void Limpiar() {
+        lblBarraEstado.setText(Constantes.VACIO);
+    }
+    //Vistas internas
+    VistaAtencionClientes vistaAtencionClientes;
+    JInternalFrame ifAtencionClientes;
+    VistaRecomendacion vistaRecomendacion;
+    JInternalFrame ifRecomendacion;
+    VistaProveedor vistaProveedor;
+    JInternalFrame ifProveedor;
+    VistaCliente vistaCliente;
+    JInternalFrame ifCliente;
+    VistaLibro vistaLibro;
+    JInternalFrame ifLibro;
+    VistaPedido vistaPedido;
+    JInternalFrame ifPedido;
+    VistaGrafos vistaGrafos;
+    JInternalFrame ifGrafo;
+    //vista fuera del MDI
+    VistaNosotros vistaNosotros;
+    Constantes.Ordenamiento ordenamiento;
+    Constantes.Busqueda busqueda;
+    //Tab actual
+    Vista tabActivo;
+    JInternalFrame frameActivo;
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        rbgOrdenamiento = new javax.swing.ButtonGroup();
+        rbgBusqueda = new javax.swing.ButtonGroup();
+        jPanel1 = new javax.swing.JPanel();
+        tlbBotonesGenerales = new javax.swing.JToolBar();
+        btnBuscar = new javax.swing.JButton();
+        btnNuevo = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnGuardar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
+        tlbOrdenamiento = new javax.swing.JToolBar();
+        jLabel1 = new javax.swing.JLabel();
+        cboOrdenarPorAtributo = new javax.swing.JComboBox<>();
+        btnAsc = new javax.swing.JButton();
+        btnDesc = new javax.swing.JButton();
+        btnAtras = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        lblBarraEstado = new javax.swing.JLabel();
+        mdiContenedor =  new javax.swing.JDesktopPane() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (backgroundImage != null) {
+                    // Dibujar el fondo con el color específico
+                    g.setColor(new Color(180, 177, 167, 255));
+                    g.fillRect(0, 0, getWidth(), getHeight());
+
+                    // Dibujar la imagen de fondo en mosaico
+                    for (int x = 0; x < getWidth(); x += backgroundImage.getWidth(null)) {
+                        for (int y = 0; y < getHeight(); y += backgroundImage.getHeight(null)) {
+                            g.drawImage(backgroundImage, x, y, this);
+                        }
+                    }
+                }
+            }
+        };
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        menuPedidos = new javax.swing.JMenuItem();
+        mniClientes = new javax.swing.JMenuItem();
+        mniProveedores = new javax.swing.JMenuItem();
+        menuLibros = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        mniSalir = new javax.swing.JMenuItem();
+        jMenu6 = new javax.swing.JMenu();
+        menuRecomendacion = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        menuColaClientes = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jMenu4 = new javax.swing.JMenu();
+        rbBubble = new javax.swing.JRadioButtonMenuItem();
+        rbSeleccion = new javax.swing.JRadioButtonMenuItem();
+        rbInsercion = new javax.swing.JRadioButtonMenuItem();
+        rbQuickSort = new javax.swing.JRadioButtonMenuItem();
+        rbShellSort = new javax.swing.JRadioButtonMenuItem();
+        rbMergeSort = new javax.swing.JRadioButtonMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        rbSecuencial = new javax.swing.JRadioButtonMenuItem();
+        rbBinaria = new javax.swing.JRadioButtonMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        mniNosotros = new javax.swing.JMenuItem();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel1.setPreferredSize(new java.awt.Dimension(268, 64));
+        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
+
+        tlbBotonesGenerales.setBackground(jPanel1.getBackground());
+
+        btnBuscar.setIcon(cargarIcono("/recursos/iconos/folder.png"));
+        btnBuscar.setText("Buscar");
+        btnBuscar.setToolTipText("Buscar");
+        btnBuscar.setFocusable(false);
+        btnBuscar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnBuscar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
+        tlbBotonesGenerales.add(btnBuscar);
+
+        btnNuevo.setIcon(cargarIcono("/recursos/iconos/new-document.png"));
+        btnNuevo.setText("Nuevo");
+        btnNuevo.setFocusable(false);
+        btnNuevo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnNuevo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoActionPerformed(evt);
+            }
+        });
+        tlbBotonesGenerales.add(btnNuevo);
+
+        btnEditar.setIcon(cargarIcono("/recursos/iconos/list.png"));
+        btnEditar.setText("Editar");
+        btnEditar.setFocusable(false);
+        btnEditar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnEditar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+        tlbBotonesGenerales.add(btnEditar);
+
+        btnGuardar.setIcon(cargarIcono("/recursos/iconos/love.png"));
+        btnGuardar.setText("Guardar");
+        btnGuardar.setFocusable(false);
+        btnGuardar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnGuardar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarActionPerformed(evt);
+            }
+        });
+        tlbBotonesGenerales.add(btnGuardar);
+
+        btnEliminar.setIcon(cargarIcono("/recursos/iconos/delete.png"));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.setFocusable(false);
+        btnEliminar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnEliminar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        tlbBotonesGenerales.add(btnEliminar);
+
+        jSeparator3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 4, 1, 4));
+        tlbBotonesGenerales.add(jSeparator3);
+
+        jPanel1.add(tlbBotonesGenerales);
+
+        tlbOrdenamiento.setBackground(jPanel1.getBackground());
+
+        jLabel1.setIcon(cargarIcono("/recursos/iconos/menu/descending.png"));
+        jLabel1.setText("Ordenar por:  ");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        tlbOrdenamiento.add(jLabel1);
+
+        cboOrdenarPorAtributo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Id" }));
+        cboOrdenarPorAtributo.setFocusable(false);
+        cboOrdenarPorAtributo.setMaximumSize(new java.awt.Dimension(200, 200));
+        cboOrdenarPorAtributo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboOrdenarPorAtributoActionPerformed(evt);
+            }
+        });
+        tlbOrdenamiento.add(cboOrdenarPorAtributo);
+
+        btnAsc.setFocusable(false);
+        btnAsc.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnAsc.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnAsc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAscActionPerformed(evt);
+            }
+        });
+        tlbOrdenamiento.add(btnAsc);
+
+        mniNavegacion = new javax.swing.JMenuItem();
+        btnDesc.setFocusable(false);
+        btnDesc.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnDesc.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDesc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDescActionPerformed(evt);
+            }
+        });
+        tlbOrdenamiento.add(btnDesc);
+
+        btnAsc.setIcon(cargarIcono("/recursos/iconos/up-chevron.png"));
+        btnAsc.setText("Ascendente");
+            }
+        });
+        tlbOrdenamiento.add(btnAtras);
+
+        jPanel1.add(tlbOrdenamiento);
+
+        lblBarraEstado.setText("lblBarraEstado");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblBarraEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblBarraEstado)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout mdiContenedorLayout = new javax.swing.GroupLayout(mdiContenedor);
+        mdiContenedor.setLayout(mdiContenedorLayout);
+        mdiContenedorLayout.setHorizontalGroup(
+            mdiContenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        mdiContenedorLayout.setVerticalGroup(
+            mdiContenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 570, Short.MAX_VALUE)
+        );
+
+        jMenu1.setText("Módulos");
+
+        menuPedidos.setIcon(cargarIconoMenu("/recursos/iconos/menu/shopping-bag.png"));
+        menuPedidos.setText("Pedidos");
+        menuPedidos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuPedidosActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuPedidos);
+
+        mniClientes.setIcon(cargarIconoMenu("/recursos/iconos/menu/user.png"));
+        mniClientes.setText("Clientes");
+        mniClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniClientesActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mniClientes);
+
+        mniProveedores.setIcon(cargarIconoMenu("/recursos/iconos/menu/laptop.png"));
+        mniProveedores.setText("Proveedores");
+        mniProveedores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniProveedoresActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mniProveedores);
+
+        menuLibros.setIcon(cargarIconoMenu("/recursos/iconos/menu/list.png"));
+        menuLibros.setText("Libros");
+        menuLibros.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLibrosActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuLibros);
+        jMenu1.add(jSeparator1);
+
+        mniSalir.setIcon(cargarIconoMenu("/recursos/iconos/menu/send.png"));
+        mniSalir.setText("Salir");
+        mniSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniSalirActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mniSalir);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu6.setText("Ventanilla");
+
+        btnDesc.setIcon(cargarIcono("/recursos/iconos/down-chevron.png"));
+        btnDesc.setText("Descendente");
+        menuColaClientes.setText("Cola de Clientes");
+        menuColaClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuColaClientesActionPerformed(evt);
+            }
+        });
+        jMenu6.add(menuColaClientes);
+
+        jMenuBar1.add(jMenu6);
+
+        jMenu3.setText("Métodos");
+
+        jMenu4.setText("Ordenamiento");
+
+        rbgOrdenamiento.add(rbBubble);
+        rbBubble.setSelected(true);
+        rbBubble.setText("Bubble");
+        jMenu4.add(rbBubble);
+
+        rbgOrdenamiento.add(rbSeleccion);
+        rbSeleccion.setText("Selección");
+        jMenu4.add(rbSeleccion);
+
+        rbgOrdenamiento.add(rbInsercion);
+        rbInsercion.setText("Inserción");
+        rbInsercion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbInsercionActionPerformed(evt);
+            }
+        });
+        jMenu4.add(rbInsercion);
+
+        rbgOrdenamiento.add(rbQuickSort);
+        rbQuickSort.setText("Quick Sort");
+        jMenu4.add(rbQuickSort);
+
+        rbgOrdenamiento.add(rbShellSort);
+        rbShellSort.setText("Shell Sort");
+        jMenu4.add(rbShellSort);
+
+        rbgOrdenamiento.add(rbMergeSort);
+        rbMergeSort.setText("Merge Sort");
+        jMenu4.add(rbMergeSort);
+
+        jMenu3.add(jMenu4);
+
+        jMenu5.setText("Búsqueda");
+
+        rbgBusqueda.add(rbSecuencial);
+        rbSecuencial.setSelected(true);
+        rbSecuencial.setText("Secuencial");
+        jMenu5.add(rbSecuencial);
+
+        rbgBusqueda.add(rbBinaria);
+        rbBinaria.setText("Binaria");
+        jMenu5.add(rbBinaria);
+
+        jMenu3.add(jMenu5);
+
+        jMenuBar1.add(jMenu3);
+
+        jMenu2.setText("Nosotros");
+
+        mniNosotros.setIcon(cargarIconoMenu("/recursos/iconos/menu/antenna.png"));
+        mniNosotros.setText("Integrantes");
+        mniNosotros.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniNosotrosActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mniNosotros);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 772, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(mdiContenedor))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mdiContenedor)
+                .addGap(5, 5, 5)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void menuPedidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuPedidosActionPerformed
+        if (ifPedido == null || !ifPedido.isVisible()) {
+            vistaPedido = new VistaPedido(ordenamiento, busqueda);
+            vistaPedido.InicializarVista();
+            historialNavegacion.apilar(vistaPedido);
+            ifPedido = crearInternalFrame("Módulo de Pedidos", vistaPedido);
+            //setSelectedComponent(tabActivo);
+        } else {
+            try {
+                // Traer el JInternalFrame al frente
+                ifPedido.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+            }
+            //mainTab.setSelectedComponent(tabActivo);
+        }
+        frameActivo = ifPedido;
+        tabActivo = vistaPedido;
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_menuPedidosActionPerformed
+
+    private void menuLibrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLibrosActionPerformed
+        if (ifLibro == null || !ifLibro.isVisible()) {
+            vistaLibro = new VistaLibro(ordenamiento, busqueda);
+            vistaLibro.InicializarVista();
+            historialNavegacion.apilar(vistaLibro);
+            ifLibro = crearInternalFrame("Módulo de Libros", vistaLibro);
+        } else {
+            try {
+                ifLibro.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+                e.printStackTrace();
+            }
+        }
+        tabActivo = vistaLibro;
+        frameActivo = ifLibro;
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_menuLibrosActionPerformed
+
+    private void mniSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSalirActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_mniSalirActionPerformed
+
+    private void mniClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniClientesActionPerformed
+        if (ifCliente == null || !ifCliente.isVisible()) {
+            vistaCliente = new VistaCliente(ordenamiento, busqueda);
+            vistaCliente.InicializarVista();
+            historialNavegacion.apilar(vistaCliente);
+
+            ifCliente = crearInternalFrame("Módulo de Cliente", vistaCliente);
+        } else {
+            try {
+                ifCliente.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+                e.printStackTrace();
+            }
+        }
+        tabActivo = vistaCliente;
+        frameActivo = ifCliente;
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_mniClientesActionPerformed
+
+    private void mniProveedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniProveedoresActionPerformed
+        if (ifProveedor == null || !ifProveedor.isVisible()) {
+            vistaProveedor = new VistaProveedor(ordenamiento, busqueda);
+            vistaProveedor.InicializarVista();
+            historialNavegacion.apilar(vistaProveedor);
+            ifProveedor = crearInternalFrame("Módulo de Proveedores", vistaProveedor);
+        } else {
+            try {
+                ifProveedor.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+                e.printStackTrace();
+            }
+        }
+        tabActivo = vistaProveedor;
+        frameActivo = ifProveedor;
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_mniProveedoresActionPerformed
+
+        btnAtras.setIcon(cargarIcono("/recursos/iconos/left-chevron.png"));
+        btnAtras.setText("Atrás");
+        btnAtras.setFocusable(false);
+        btnAtras.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnAtras.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnAtras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtrasActionPerformed(evt);
+
+    private void mniNosotrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniNosotrosActionPerformed
+        if (vistaNosotros == null) {
+            vistaNosotros = new VistaNosotros();
+        }
+        JDialog dialogoModal = new JDialog(this, "Integrantes del Proyecto", true);
+        dialogoModal.setSize(520, 377);
+        dialogoModal.setLocationRelativeTo(null); // centrar en la pantalla
+        dialogoModal.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialogoModal.add(vistaNosotros);
+        dialogoModal.setVisible(true);
+    }//GEN-LAST:event_mniNosotrosActionPerformed
+
+    private void cboOrdenarPorAtributoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboOrdenarPorAtributoActionPerformed
+        // cuando cambie el tipo de atributo a ordenar, actualizar sobre que atributo ordenar
+        // si se cambia la pestana, el valor seleccionado regresa al por defecto de cada moulo
+
+    }//GEN-LAST:event_cboOrdenarPorAtributoActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        if (tabActivo == null) {
+            return;
+        }
+        // Por defecto busca por ID
+        tabActivo.Buscar();
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
+        if (tabActivo == null) {
+            return;
+        }
+        // Invoca metodo Limpiar y Activa todos los campos (Activar).
+        tabActivo.Limpiar();
+        tabActivo.Activar(Constantes.Activar.TODOS_ELEMENTOS);
+
+    }//GEN-LAST:event_btnNuevoActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        if (tabActivo == null) {
+            return;
+        }
+        // Activa todos los campos (Activar)
+        tabActivo.Activar(Constantes.Activar.SOLO_EDITAR);
+
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+        if (tabActivo == null) {
+            return;
+        }
+        // Inserta en la lista enlazada respectiva (Guardar), Limpiar y Listar.
+        if (tabActivo.Guardar()) {
+            tabActivo.Limpiar();
+            tabActivo.Listar();
+            tabActivo.Activar(Constantes.Activar.BUSCAR);
+        }
+
+    }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        if (tabActivo == null) {
+            return;
+        }
+        // Eliminar seleccionado segun Id
+        tabActivo.Eliminar();
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void rbInsercionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbInsercionActionPerformed
+
+    }//GEN-LAST:event_rbInsercionActionPerformed
+
+    private void btnAscActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAscActionPerformed
+        if (tabActivo == null) {
+            return;
+        }
+        tabActivo.Ordenar(true); //ascendente
+    }//GEN-LAST:event_btnAscActionPerformed
+
+    private void btnDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDescActionPerformed
+        if (tabActivo == null) {
+            return;
+        }
+        tabActivo.Ordenar(false); //descendente
+    }//GEN-LAST:event_btnDescActionPerformed
+
+    private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
+        menuRecomendacion.setIcon(cargarIconoMenu("/recursos/iconos/menu/help.png"));
+        menuRecomendacion.setText("Recomendacion");
+        menuRecomendacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuRecomendacionActionPerformed(evt);
+            }
+        });
+        jMenu6.add(menuRecomendacion);
+
+        mniNavegacion.setIcon(cargarIconoMenu("/recursos/iconos/menu/map.png"));
+        mniNavegacion.setText("Navegacion | Recomendacion");
+        mniNavegacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniNavegacionActionPerformed(evt);
+            }
+        });
+        jMenu6.add(mniNavegacion);
+        jMenu6.add(jSeparator2);
+
+        menuColaClientes.setIcon(cargarIconoMenu("/recursos/iconos/menu/spy.png"));
+        }
+        historialNavegacion.desapilar();
+        if (!historialNavegacion.estaVacio()) {
+            tabActivo = historialNavegacion.desapilar();
+            // Obtener el JInternalFrame desde la vista
+            JInternalFrame frameAnterior = tabActivo.getInternalFrame();
+
+            try {
+                frameAnterior.setSelected(true);
+                frameActivo = frameAnterior;
+                lblBarraEstado.setText("Módulo " + tabActivo.nombre + tabActivo.TAD);
+                tabActivo.Limpiar();
+                tabActivo.Activar(Constantes.Activar.BUSCAR);
+                tabActivo.Listar();
+            } catch (java.beans.PropertyVetoException e) {
+            }
+            //mainTab.setSelectedComponent(tabActivo);
+        }
+    }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void menuRecomendacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRecomendacionActionPerformed
+        if (ifRecomendacion == null || !ifRecomendacion.isVisible()) {
+            vistaRecomendacion = new VistaRecomendacion(ordenamiento, busqueda);
+            vistaRecomendacion.InicializarVista();
+            historialNavegacion.apilar(vistaRecomendacion);
+            ifRecomendacion = crearInternalFrame("Recomendaciones", vistaRecomendacion);
+        } else {
+            try {
+                ifRecomendacion.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+            }
+        }
+        tabActivo = vistaRecomendacion;
+        frameActivo = ifRecomendacion;
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_menuRecomendacionActionPerformed
+
+    private void menuColaClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuColaClientesActionPerformed
+        if (ifAtencionClientes == null || !ifAtencionClientes.isVisible()) {
+            vistaAtencionClientes = new VistaAtencionClientes(ordenamiento, busqueda);
+            vistaAtencionClientes.InicializarVista();
+            historialNavegacion.apilar(vistaAtencionClientes);
+            ifAtencionClientes = crearInternalFrame("Cola de Clientes", vistaAtencionClientes);
+        } else {
+            try {
+                ifAtencionClientes.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+            }
+        }
+        tabActivo = vistaAtencionClientes;
+        frameActivo = ifAtencionClientes;
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_menuColaClientesActionPerformed
+
+    private void mniNavegacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniNavegacionActionPerformed
+        if (ifGrafo == null || !ifGrafo.isVisible()) {
+            vistaGrafos = new VistaGrafos(ordenamiento, busqueda);
+            vistaGrafos.InicializarVista();
+            historialNavegacion.apilar(vistaGrafos);
+            ifGrafo = crearInternalFrame("Recomendación de Libros y Navegación de Biblioteca", vistaGrafos);
+        } else {
+            try {
+                ifGrafo.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+            }
+        }
+        tabActivo = vistaGrafos;
+        frameActivo = ifGrafo;
+        tabActivo.Activar(Constantes.Activar.BUSCAR);
+    }//GEN-LAST:event_mniNavegacionActionPerformed
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAsc;
+    private javax.swing.JButton btnAtras;
+    private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnDesc;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnNuevo;
+    private javax.swing.JComboBox<String> cboOrdenarPorAtributo;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
+    private void internalFrameStateChanged(PropertyChangeEvent evt) {
+        // Cada vez que se cambie la ventana interna activa se ejecuta este evento    
+        JInternalFrame selectedFrame = (JInternalFrame) evt.getSource();
+        if (selectedFrame.getContentPane().getComponentCount() > 0
+                && selectedFrame.getContentPane() instanceof Vista) {
+
+            Vista vista = (Vista) selectedFrame.getContentPane();
+
+            if (vista != null) {
+                historialNavegacion.apilar(vista);
+            }
+            frameActivo = selectedFrame;
+            tabActivo = vista;
+            lblBarraEstado.setText("Módulo " + vista.nombre + vista.TAD);
+            vista.Limpiar();
+            vista.Activar(Constantes.Activar.BUSCAR);
+            vista.Listar();
+        } else {
+            System.err.println("El componente no es una instancia de Vista");
+        }
+    }
+    private javax.swing.JLabel lblBarraEstado;
+    private javax.swing.JMenuItem menuColaClientes;
+    private javax.swing.JMenuItem menuLibros;
+    private javax.swing.JMenuItem menuPedidos;
+    private javax.swing.JMenuItem menuRecomendacion;
+    private javax.swing.JMenuItem mniClientes;
+    private javax.swing.JMenuItem mniNavegacion;
+    private javax.swing.JMenuItem mniNosotros;
+    private javax.swing.JMenuItem mniProveedores;
+    private javax.swing.JMenuItem mniSalir;
+    private javax.swing.JRadioButtonMenuItem rbBinaria;
+    private javax.swing.JRadioButtonMenuItem rbBubble;
+    private javax.swing.JRadioButtonMenuItem rbInsercion;
+    private javax.swing.JRadioButtonMenuItem rbMergeSort;
+    private javax.swing.JRadioButtonMenuItem rbQuickSort;
+    private javax.swing.JRadioButtonMenuItem rbSecuencial;
+    private javax.swing.JRadioButtonMenuItem rbSeleccion;
+    private javax.swing.JRadioButtonMenuItem rbShellSort;
+    private javax.swing.ButtonGroup rbgBusqueda;
+    private javax.swing.ButtonGroup rbgOrdenamiento;
+    private javax.swing.JToolBar tlbBotonesGenerales;
+    private javax.swing.JToolBar tlbOrdenamiento;
+    // End of variables declaration//GEN-END:variables
+}
